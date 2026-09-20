@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+:root {
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F7F5F3;
+  --color-surface-card: #FFFFFF;
+  --color-primary: #B5541D;
+  --color-primary-hover: #9E4616;
+  --color-primary-light: #FBF1EB;
+  --color-primary-ring: rgba(181, 84, 29, 0.25);
+  --color-alert: #C1272D;
+  --color-alert-hover: #A51D22;
+  --color-alert-light: #FDE8E9;
+  --color-border: #E7E5E4;
+  --color-border-subtle: #F0EEEB;
+  --color-text-main: #1C1917;
+  --color-text-muted: #78716C;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-main);
+}
+
+h1, h2, h3, .font-heading {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Accessibility focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Card with soft shadow (from design tokens) */
+.soft-card {
+  background: var(--color-surface);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.05), 0 2px 6px -1px rgba(28, 25, 23, 0.02);
+  transition: all 0.2s ease-in-out;
+}
+
+.soft-card-interactive:hover {
+  box-shadow: 0 8px 26px -4px rgba(28, 25, 23, 0.09), 0 4px 10px -2px rgba(28, 25, 23, 0.03);
+  transform: translateY(-1px);
+}
+
+/* Square loading spinner adapted from file_6.css with --color-primary (#B5541D) */
+.spinner-squares {
+  width: 44px;
+  height: 44px;
+  animation: spinner-squares-rotate 2s infinite ease;
+  transform-origin: center center;
+}
+
+.spinner-squares span {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background-color: var(--color-primary);
+  border-radius: 4px;
+}
+
+.spinner-squares span:nth-child(1) {
+  top: 0;
+  left: 0;
+  animation: spinner-square-1 2s infinite ease;
+}
+
+.spinner-squares span:nth-child(2) {
+  top: 0;
+  right: 0;
+  animation: spinner-square-2 2s infinite ease;
+}
+
+.spinner-squares span:nth-child(3) {
+  bottom: 0;
+  right: 0;
+  animation: spinner-square-3 2s infinite ease;
+}
+
+.spinner-squares span:nth-child(4) {
+  bottom: 0;
+  left: 0;
+  animation: spinner-square-4 2s infinite ease;
+}
+
+@keyframes spinner-squares-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinner-square-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(4px, 4px) scale(0.8); }
+}
+
+@keyframes spinner-square-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-4px, 4px) scale(0.8); }
+}
+
+@keyframes spinner-square-3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-4px, -4px) scale(0.8); }
+}
+
+@keyframes spinner-square-4 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(4px, -4px) scale(0.8); }
+}
+
+/* Checkbox with animated stroke-dashoffset checkmark (file_4.css) */
+.animated-checkbox-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.animated-checkbox-input {
+  opacity: 0;
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.animated-checkbox-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #D6D3D1;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animated-checkbox-input:checked + .animated-checkbox-box {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.animated-checkbox-input:focus-visible + .animated-checkbox-box {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.animated-checkbox-check {
+  stroke: #FFFFFF;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 0.3s ease 0.05s;
+}
+
+.animated-checkbox-input:checked + .animated-checkbox-box .animated-checkbox-check {
+  stroke-dashoffset: 0;
+}
+
+/* Toggle switch (file_5.css style) */
+.custom-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.custom-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E7E5E4;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.custom-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.custom-toggle input:checked + .custom-toggle-slider {
+  background-color: var(--color-primary);
+}
+
+.custom-toggle input:focus-visible + .custom-toggle-slider {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.custom-toggle input:checked + .custom-toggle-slider:before {
+  transform: translateX(20px);
+}
