@@ -7,6 +7,7 @@ import {
   NotebookLink,
   UserProfile,
   GiornoSettimana,
+  AppBackupData,
 } from './models';
 import * as store from './store';
 import {
@@ -52,6 +53,10 @@ interface SchoolStoreContextType {
   // Reset demo & Clear all
   resetAllData: () => void;
   clearAllData: () => void;
+  // Backup & Restore
+  exportBackup: () => AppBackupData;
+  importBackup: (backup: AppBackupData) => { success: boolean; error?: string };
+  getStorageEstimate: () => { bytes: number; formatted: string };
 }
 
 const SchoolStoreContext = createContext<SchoolStoreContextType | null>(null);
@@ -313,6 +318,25 @@ export const SchoolStoreProvider: React.FC<{ children: React.ReactNode }> = ({ c
     refreshFromStore();
   }, [refreshFromStore]);
 
+  /* Backup & Restore */
+  const exportBackup = useCallback((): AppBackupData => {
+    return store.exportBackupData();
+  }, []);
+
+  const importBackup = useCallback((backup: AppBackupData): { success: boolean; error?: string } => {
+    const res = store.importBackupData(backup);
+    if (res.success) {
+      refreshFromStore();
+    } else if (res.error) {
+      setLastError(res.error);
+    }
+    return res;
+  }, [refreshFromStore]);
+
+  const getStorageEstimate = useCallback(() => {
+    return store.getStorageSizeEstimate();
+  }, []);
+
   const value = useMemo(() => ({
     materie,
     orario,
@@ -342,6 +366,9 @@ export const SchoolStoreProvider: React.FC<{ children: React.ReactNode }> = ({ c
     updateUser,
     resetAllData,
     clearAllData,
+    exportBackup,
+    importBackup,
+    getStorageEstimate,
   }), [
     materie,
     orario,
@@ -371,6 +398,9 @@ export const SchoolStoreProvider: React.FC<{ children: React.ReactNode }> = ({ c
     updateUser,
     resetAllData,
     clearAllData,
+    exportBackup,
+    importBackup,
+    getStorageEstimate,
   ]);
 
   return <SchoolStoreContext.Provider value={value}>{children}</SchoolStoreContext.Provider>;

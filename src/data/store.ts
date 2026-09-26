@@ -1,4 +1,4 @@
-import { Materia, SlotOrario, Evento, Compito, NotebookLink, UserProfile } from './models';
+import { Materia, SlotOrario, Evento, Compito, NotebookLink, UserProfile, AppBackupData } from './models';
 import {
   DEFAULT_MATERIE,
   DEFAULT_ORARIO,
@@ -170,3 +170,69 @@ export function clearAllData(): StorageResult<boolean> {
   });
   return { success: true, data: true };
 }
+
+/* ==================== BACKUP & RESTORE ==================== */
+export function exportBackupData(): AppBackupData {
+  return {
+    versione: '1.0',
+    dataEsportazione: new Date().toISOString(),
+    user: getUserProfile(),
+    materie: getMaterie(),
+    orario: getOrario(),
+    eventi: getEventi(),
+    compiti: getCompiti(),
+    notebooks: getNotebooks(),
+  };
+}
+
+export function importBackupData(backup: AppBackupData): StorageResult<boolean> {
+  try {
+    if (!backup || typeof backup !== 'object') {
+      return { success: false, error: 'File di backup non valido o danneggiato.' };
+    }
+
+    if (backup.user && typeof backup.user === 'object') {
+      saveUserProfile(backup.user);
+    }
+    if (Array.isArray(backup.materie)) {
+      saveMaterie(backup.materie);
+    }
+    if (Array.isArray(backup.orario)) {
+      saveOrario(backup.orario);
+    }
+    if (Array.isArray(backup.eventi)) {
+      saveEventi(backup.eventi);
+    }
+    if (Array.isArray(backup.compiti)) {
+      saveCompiti(backup.compiti);
+    }
+    if (Array.isArray(backup.notebooks)) {
+      saveNotebooks(backup.notebooks);
+    }
+
+    notifyListeners();
+    return { success: true, data: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Errore sconosciuto durante il ripristino del backup.';
+    return { success: false, error: msg };
+  }
+}
+
+export function getStorageSizeEstimate(): { bytes: number; formatted: string } {
+  try {
+    let total = 0;
+    Object.values(STORAGE_KEYS).forEach(key => {
+      const val = localStorage.getItem(key);
+      if (val) {
+        total += key.length + val.length;
+      }
+    });
+    const bytes = total * 2; // UTF-16 in JavaScript
+    if (bytes < 1024) return { bytes, formatted: `${bytes} B` };
+    const kb = (bytes / 1024).toFixed(1);
+    return { bytes, formatted: `${kb} KB` };
+  } catch {
+    return { bytes: 0, formatted: '0 KB' };
+  }
+}
+

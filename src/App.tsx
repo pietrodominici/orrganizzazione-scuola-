@@ -14,15 +14,17 @@ import {
   Battery,
   Signal,
   Sparkles,
+  Settings,
 } from 'lucide-react';
 import { SchoolStoreProvider, useSchoolStore } from './data/useSchoolStore';
 import { DashboardView } from './dashboard/DashboardView';
 import { WeeklyTimetable } from './orario/WeeklyTimetable';
 import { TasksView } from './compiti/TasksView';
 import { NotebookView } from './notebook/NotebookView';
+import { SettingsView } from './impostazioni/SettingsView';
 import { ConfirmModal } from './shared/ConfirmModal';
 
-type ActiveTab = 'dashboard' | 'orario' | 'compiti' | 'notebook';
+type ActiveTab = 'dashboard' | 'orario' | 'compiti' | 'notebook' | 'impostazioni';
 
 const MainLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
@@ -64,6 +66,11 @@ const MainLayout: React.FC = () => {
       icon: BookMarked,
       badge: notebooks.length > 0 ? notebooks.length : undefined,
     },
+    {
+      id: 'impostazioni' as ActiveTab,
+      label: 'Impostazioni',
+      icon: Settings,
+    },
   ];
 
   const getTabTitle = () => {
@@ -76,6 +83,8 @@ const MainLayout: React.FC = () => {
         return 'Compiti & Verifiche';
       case 'notebook':
         return 'Quaderni NotebookLM';
+      case 'impostazioni':
+        return 'Impostazioni & Backup';
     }
   };
 
@@ -95,6 +104,8 @@ const MainLayout: React.FC = () => {
         return <TasksView />;
       case 'notebook':
         return <NotebookView />;
+      case 'impostazioni':
+        return <SettingsView onNavigateToDashboard={() => setActiveTab('dashboard')} />;
     }
   };
 
@@ -191,7 +202,7 @@ const MainLayout: React.FC = () => {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-all cursor-pointer shadow-2xs"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                <span className="hidden sm:inline">Elimina Demo (Svuota)</span>
+                <span className="hidden sm:inline">Svuota App</span>
                 <span className="sm:hidden">Svuota</span>
               </button>
 
@@ -204,6 +215,21 @@ const MainLayout: React.FC = () => {
                 aria-label="Ripristina dati demo"
               >
                 <RotateCcw className="w-4 h-4" />
+              </button>
+
+              {/* Settings Shortcut Button */}
+              <button
+                type="button"
+                onClick={() => setActiveTab('impostazioni')}
+                title="Impostazioni & Backup"
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                  activeTab === 'impostazioni'
+                    ? 'bg-[#B5541D] text-white shadow-xs'
+                    : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100'
+                }`}
+                aria-label="Impostazioni e Backup"
+              >
+                <Settings className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -318,6 +344,18 @@ const MainLayout: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('impostazioni')}
+                    title="Impostazioni & Backup"
+                    className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                      activeTab === 'impostazioni'
+                        ? 'bg-[#B5541D] text-white'
+                        : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100'
+                    }`}
+                  >
+                    <Settings className="w-3.5 h-3.5" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => setIsClearConfirmOpen(true)}

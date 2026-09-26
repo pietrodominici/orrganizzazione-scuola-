@@ -50,6 +50,17 @@ export interface UserProfile {
   isGoogleConnected?: boolean;
 }
 
+export interface AppBackupData {
+  versione: string;
+  dataEsportazione: string;
+  user: UserProfile;
+  materie: Materia[];
+  orario: SlotOrario[];
+  eventi: Evento[];
+  compiti: Compito[];
+  notebooks: NotebookLink[];
+}
+
 export const GIORNI_SETTIMANA: { id: GiornoSettimana; nome: string; nomeBreve: string }[] = [
   { id: 'lun', nome: 'Lunedì', nomeBreve: 'Lun' },
   { id: 'mar', nome: 'Martedì', nomeBreve: 'Mar' },
