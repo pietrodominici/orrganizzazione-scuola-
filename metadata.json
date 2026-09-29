@@ -1,6 +1,6 @@
 {
   "name": "Organizza Scuola",
-  "description": "Applicazione per l'organizzazione scolastica con sezioni dedicate per Dashboard panoramica, Orario settimanale con colori, Compiti & Verifiche con countdown e Quaderni NotebookLM, ottimizzata per desktop e iPhone.",
+  "description": "Applicazione per l'organizzazione scolastica con Dashboard con calendario verifiche e materie del giorno dopo, Orario settimanale con colori, Sincronizzazione Google Calendar e Impostazioni con backup.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

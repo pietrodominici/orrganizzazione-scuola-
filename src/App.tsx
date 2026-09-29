@@ -2,52 +2,36 @@ import React, { useState } from 'react';
 import {
   LayoutDashboard,
   CalendarDays,
-  CheckSquare,
-  BookMarked,
+  Calendar,
   GraduationCap,
   AlertTriangle,
-  RotateCcw,
-  Trash2,
   Smartphone,
   Maximize2,
   Wifi,
   Battery,
   Signal,
-  Sparkles,
   Settings,
 } from 'lucide-react';
 import { SchoolStoreProvider, useSchoolStore } from './data/useSchoolStore';
 import { DashboardView } from './dashboard/DashboardView';
 import { WeeklyTimetable } from './orario/WeeklyTimetable';
-import { TasksView } from './compiti/TasksView';
-import { NotebookView } from './notebook/NotebookView';
+import { GoogleCalendarSyncView } from './calendar/GoogleCalendarSyncView';
 import { SettingsView } from './impostazioni/SettingsView';
-import { ConfirmModal } from './shared/ConfirmModal';
 
-type ActiveTab = 'dashboard' | 'orario' | 'compiti' | 'notebook' | 'impostazioni';
+type ActiveTab = 'dashboard' | 'orario' | 'calendarSync' | 'impostazioni';
 
 const MainLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
-  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
-  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [deviceView, setDeviceView] = useState<'fullscreen' | 'iphone'>('fullscreen');
   const [isIslandExpanded, setIsIslandExpanded] = useState(false);
 
-  const { lastError, clearError, resetAllData, clearAllData, user, compiti, eventi, notebooks } = useSchoolStore();
-
-  const pendingTasksCount = compiti.filter(c => !c.fatto).length;
-  const urgentEventsCount = eventi.filter(e => {
-    const todayStr = '2026-09-20';
-    const limitStr = '2026-09-22';
-    return e.data >= todayStr && e.data <= limitStr;
-  }).length;
+  const { lastError, clearError, user, eventi } = useSchoolStore();
 
   const navItems = [
     {
       id: 'dashboard' as ActiveTab,
       label: 'Dashboard',
       icon: LayoutDashboard,
-      badge: urgentEventsCount > 0 ? urgentEventsCount : undefined,
     },
     {
       id: 'orario' as ActiveTab,
@@ -55,16 +39,10 @@ const MainLayout: React.FC = () => {
       icon: CalendarDays,
     },
     {
-      id: 'compiti' as ActiveTab,
-      label: 'Compiti',
-      icon: CheckSquare,
-      badge: pendingTasksCount > 0 ? pendingTasksCount : undefined,
-    },
-    {
-      id: 'notebook' as ActiveTab,
-      label: 'NotebookLM',
-      icon: BookMarked,
-      badge: notebooks.length > 0 ? notebooks.length : undefined,
+      id: 'calendarSync' as ActiveTab,
+      label: 'Google Calendar',
+      icon: Calendar,
+      badge: eventi.length > 0 ? eventi.length : undefined,
     },
     {
       id: 'impostazioni' as ActiveTab,
@@ -79,10 +57,8 @@ const MainLayout: React.FC = () => {
         return 'Dashboard Scuola';
       case 'orario':
         return 'Orario Lezioni';
-      case 'compiti':
-        return 'Compiti & Verifiche';
-      case 'notebook':
-        return 'Quaderni NotebookLM';
+      case 'calendarSync':
+        return 'Sincronizzazione Google Calendar';
       case 'impostazioni':
         return 'Impostazioni & Backup';
     }
@@ -93,17 +69,14 @@ const MainLayout: React.FC = () => {
       case 'dashboard':
         return (
           <DashboardView
-            onNavigateToTasks={() => setActiveTab('compiti')}
             onNavigateToTimetable={() => setActiveTab('orario')}
-            onNavigateToNotebooks={() => setActiveTab('notebook')}
+            onNavigateToCalendarSync={() => setActiveTab('calendarSync')}
           />
         );
       case 'orario':
         return <WeeklyTimetable />;
-      case 'compiti':
-        return <TasksView />;
-      case 'notebook':
-        return <NotebookView />;
+      case 'calendarSync':
+        return <GoogleCalendarSyncView />;
       case 'impostazioni':
         return <SettingsView onNavigateToDashboard={() => setActiveTab('dashboard')} />;
     }
@@ -130,7 +103,7 @@ const MainLayout: React.FC = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation Tabs for ALL 5 SECTIONS */}
+            {/* Desktop Navigation Tabs */}
             <nav className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200" aria-label="Sezioni principali">
               {navItems.map(item => {
                 const Icon = item.icon;
@@ -163,7 +136,7 @@ const MainLayout: React.FC = () => {
               })}
             </nav>
 
-            {/* Right Utilities (Device View Switcher, Clear Demo & Reset) */}
+            {/* Right Utilities (Device View Switcher & Settings Shortcut) */}
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex items-center p-0.5 bg-stone-100 rounded-xl border border-stone-200">
                 <button
@@ -194,30 +167,7 @@ const MainLayout: React.FC = () => {
                 </button>
               </div>
 
-              {/* Clear Demo Button */}
-              <button
-                type="button"
-                onClick={() => setIsClearConfirmOpen(true)}
-                title="Elimina tutti i dati demo per iniziare con l'app completamente vuota"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-all cursor-pointer shadow-2xs"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                <span className="hidden sm:inline">Svuota App</span>
-                <span className="sm:hidden">Svuota</span>
-              </button>
-
-              {/* Reset Demo Button */}
-              <button
-                type="button"
-                onClick={() => setIsResetConfirmOpen(true)}
-                title="Ripristina dati demo di esempio"
-                className="p-2 text-stone-400 hover:text-[#B5541D] hover:bg-stone-100 rounded-xl transition-colors cursor-pointer"
-                aria-label="Ripristina dati demo"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-
-              {/* Settings Shortcut Button */}
+              {/* Settings Shortcut Button (Svuota & Ripristina are only in Impostazioni) */}
               <button
                 type="button"
                 onClick={() => setActiveTab('impostazioni')}
@@ -233,36 +183,6 @@ const MainLayout: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Mobile Horizontal Section Tabs Bar (Below Header on phones) */}
-        <div className="md:hidden border-t border-stone-200 bg-[#FDFBF9] overflow-x-auto px-3 py-2 flex items-center gap-1.5 scrollbar-none">
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveTab(item.id)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
-                  isActive
-                    ? 'bg-[#B5541D] text-white shadow-xs'
-                    : 'bg-white text-stone-600 hover:text-stone-900 border border-stone-200'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{item.label}</span>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className={`px-1 text-[10px] rounded-full ${
-                    isActive ? 'bg-white/30 text-white' : 'bg-stone-100 text-stone-600'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
         </div>
       </header>
 
@@ -313,15 +233,15 @@ const MainLayout: React.FC = () => {
                         <span className="font-bold text-white">{user.classe || '4ª S'}</span>
                       </span>
                       <span className="text-stone-400">
-                        {pendingTasksCount} compiti
+                        {eventi.length} prove in calendario
                       </span>
                     </div>
                   ) : (
                     <>
                       <div className="w-2.5 h-2.5 rounded-full bg-stone-900 ring-1 ring-stone-800" />
                       <div className="w-2 h-2 rounded-full bg-stone-950" />
-                      {urgentEventsCount > 0 && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#C1272D] animate-pulse" />
+                      {eventi.length > 0 && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B5541D]" />
                       )}
                     </>
                   )}
@@ -348,30 +268,13 @@ const MainLayout: React.FC = () => {
                     type="button"
                     onClick={() => setActiveTab('impostazioni')}
                     title="Impostazioni & Backup"
-                    className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                    className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                       activeTab === 'impostazioni'
-                        ? 'bg-[#B5541D] text-white'
+                        ? 'bg-[#B5541D] text-white shadow-xs'
                         : 'text-stone-500 hover:text-stone-800 hover:bg-stone-100'
                     }`}
                   >
-                    <Settings className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsClearConfirmOpen(true)}
-                    title="Elimina demo (svuota app)"
-                    className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-3 h-3 text-rose-600" />
-                    <span>Svuota</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsResetConfirmOpen(true)}
-                    title="Ripristina dati demo"
-                    className="p-1 text-stone-400 hover:text-[#B5541D] hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
+                    <Settings className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -459,37 +362,6 @@ const MainLayout: React.FC = () => {
           </div>
         </nav>
       )}
-
-      {/* Clear Demo Confirmation Modal (Completely empty app) */}
-      <ConfirmModal
-        isOpen={isClearConfirmOpen}
-        title="Elimina Dati Demo (Svuota App)"
-        message="Sei sicuro di voler eliminare tutti i dati demo? Verranno azzerati l'orario settimanale, tutte le verifiche, i compiti e i quaderni di esempio. L'app rimarrà completamente vuota, pronta per inserire i tuoi dati reali."
-        confirmLabel="Sì, elimina demo e svuota"
-        cancelLabel="Annulla"
-        isDestructive={true}
-        onConfirm={() => {
-          clearAllData();
-          setIsClearConfirmOpen(false);
-          setActiveTab('dashboard');
-        }}
-        onCancel={() => setIsClearConfirmOpen(false)}
-      />
-
-      {/* Reset Demo Confirmation Modal */}
-      <ConfirmModal
-        isOpen={isResetConfirmOpen}
-        title="Ripristina Dati Demo di Esempio"
-        message="Vuoi ripristinare i dati demo di esempio per visualizzare come funziona l'app completa? I dati attuali verranno sostituiti con i dati di esempio."
-        confirmLabel="Sì, ripristina demo"
-        cancelLabel="Annulla"
-        isDestructive={false}
-        onConfirm={() => {
-          resetAllData();
-          setIsResetConfirmOpen(false);
-        }}
-        onCancel={() => setIsResetConfirmOpen(false)}
-      />
     </div>
   );
 };
